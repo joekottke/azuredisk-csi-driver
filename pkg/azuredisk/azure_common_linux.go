@@ -102,15 +102,16 @@ func findDiskByLunWithConstraint(lun int, io ioHandler, azureDisks []string) (st
 			}
 			if len(azureDisks) == 0 {
 				klog.V(4).Infof("/dev/disk/azure is not populated, now try to parse %v directly", name)
-				target, err := strconv.Atoi(arr[0])
+				//target, err := strconv.Atoi(arr[0])
+				_, err := strconv.Atoi(arr[0])
 				if err != nil {
 					klog.Errorf("failed to parse target from %v (%v), err %v", arr[0], name, err)
 					continue
 				}
 				// as observed, targets 0-3 are used by OS disks. Skip them
-				if target <= 3 {
-					continue
-				}
+				// if target <= 3 {
+				// 	continue
+				// }
 			}
 
 			// extract LUN from the path.
@@ -161,7 +162,7 @@ func findDiskByLunWithConstraint(lun int, io ioHandler, azureDisks []string) (st
 						}
 					}
 					if !found {
-						devLinkPaths := []string{"/devhost/disk/azure/scsi1/", "/devhost/disk/by-id/"}
+						devLinkPaths := []string{"/devhost/disk/azure/scsi1/"}
 						for _, devLinkPath := range devLinkPaths {
 							diskPath, err := getDiskLinkByDevName(io, devLinkPath, devName)
 							if err == nil {
@@ -170,7 +171,6 @@ func findDiskByLunWithConstraint(lun int, io ioHandler, azureDisks []string) (st
 							}
 							klog.Warningf("azureDisk - getDiskLinkByDevName by %s under %s failed, error: %v", devName, devLinkPath, err)
 						}
-						return "/devhost/" + devName, nil
 					}
 				}
 			}
